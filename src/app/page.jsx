@@ -4,13 +4,15 @@ export default function Home() {
   return (
     <div className="text-center">
       <header className="min-[300px]:pt-15 md:pt-20 pt-10 sm:px-4 lg:px-8 mx-auto">
-        <h1 className="2xl:text-8xl lg:text-8xl text-3xl min-[300px]:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-black to-custom_purple">
+        <h1 className="2xl:text-8xl lg:text-8xl text-3xl min-[300px]:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-custom_purple to-black">
           Audits of{" "}
           <span className="min-[1220px]:inline-block bg-black text-white px-1 rounded-md min-[1220px]:whitespace-nowrap">
-            Your business&apos;s online
+            <span className="bg-clip-text text-transparent bg-gradient-to-r from-white to-pink-500">
+              Your business&apos;s online
+            </span>
           </span>
         </h1>
-        <p className="mb-8 2xl:text-8xl lg:text-8xl text-3xl min-[300px]:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-black to-custom_purple min-[1020px]:-translate-y-4">
+        <p className="mb-8 2xl:text-8xl lg:text-8xl text-3xl min-[300px]:text-5xl font-bold min-[1020px]:-translate-y-4 bg-clip-text text-transparent bg-gradient-to-r from-custom_purple to-black">
           presence
         </p>
         <p className="block text-lg min-[300px]:text-xl sm:w-4/5 sm:mx-auto mx-4">
@@ -20,7 +22,7 @@ export default function Home() {
         </p>
       </header>
       <main>
-        <section className="md:my-12 md:px-6 md:py-4 w-5/6 md:w-4/5 lg:w-3/5 mx-auto backdrop-blur-sm rounded-md px-2 py-2 border-solid border-2 border-custom_purple">
+        <section className="md:my-12 md:px-6 md:py-4 w-5/6 md:w-4/5 lg:w-3/5 mx-auto backdrop-blur-sm rounded-md px-2 py-2 border-solid border-2 border-custom_purple ">
           <h2 className="inline-block text-3xl font-semibold bg-black text-white px-1 rounded-md mb-4">
             How we can help You
           </h2>
@@ -34,8 +36,8 @@ export default function Home() {
             would need improvement.
           </p>
         </section>
-        <section className="section-background h-96 w-4/5 mx-auto my-12 flex flex-col justify-center">
-          <h2 className="w-fit inline-block mx-auto -translate-y-4 text-4xl font-semibold bg-custom_purple text-white px-1 rounded-md mb-4 border-solid border-2 border-[#001220]">
+        <section className="section-background h-96 w-9/12 mx-auto my-12 flex flex-col justify-center border-solid border-2 border-[#001220]">
+          <h2 className="w-fit inline-block mx-auto -translate-y-4 text-4xl py-1 px-2 font-semibold bg-custom_purple text-white px-1 rounded-md mb-4 border-solid border-2 border-[#001220]">
             Lets Start here
           </h2>
           <Form />
