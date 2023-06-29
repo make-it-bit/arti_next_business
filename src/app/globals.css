@@ -25,7 +25,6 @@ body {
 
 .section-background {
   background-image: url("../../public/blob-scene-haikei.svg");
-  border-radius: 30px;
 }
 
 @keyframes gradient {

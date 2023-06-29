@@ -36,8 +36,8 @@ export default function Home() {
             would need improvement.
           </p>
         </section>
-        <section className="section-background h-96 w-9/12 mx-auto my-12 flex flex-col justify-center border-solid border-2 border-[#001220]">
-          <h2 className="w-fit inline-block mx-auto -translate-y-4 text-4xl py-1 px-2 font-semibold bg-custom_purple text-white px-1 rounded-md mb-4 border-solid border-2 border-[#001220]">
+        <section className="section-background h-fit w-9/12 mx-auto my-12 flex flex-col justify-center border-solid border-2 border-[#001220] rounded-md pt-8 pb-12">
+          <h2 className="w-fit inline-block mx-auto -translate-y-4 text-4xl py-1 px-2 font-semibold bg-custom_purple text-white px-1 rounded-md mb-4">
             Lets Start here
           </h2>
           <Form />
