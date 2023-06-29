@@ -3,24 +3,29 @@ import { useState, useEffect, useCallback } from "react";
 
 const Form = () => {
   const [businessName, setBusinessName] = useState("");
+  const [isCorrectBusinessName, setIsCorrectBusinessName] = useState(false);
   const [csvFile, setCsvFile] = useState({});
+  const [isCorrectCsvFile, setIsCorrectCsvFile] = useState(false);
   const [errorMessage, setErrorMessage] = useState("The form might be faulty.");
   const [displayErrorMessage, setDisplayErrorMessage] = useState(false);
+  const [toDisplayButton, setToDisplayButton] = useState(true);
 
   const handleDisplayErrorMessage = useCallback(
-    (toDisplay, errormessage) => {
-      console.log("toDisplay, errormessage: ", toDisplay, errormessage);
+    (errorParams) => {
+      setToDisplayButton(false);
+      if (errorParams.fromWhere === "onNameChange") {
+        const isCorrectCompanyName =
+          businessName.length > 3 &&
+          (businessName.includes("AS") || businessName.includes("OÜ"));
+        if (!isCorrectCompanyName) {
+          setErrorMessage(errorParams.message);
+          setDisplayErrorMessage(errorParams.toDisplay);
+        }
+      }
 
-      const isCorrectCompanyName =
-        businessName.length > 3 &&
-        (businessName.includes("AS") || businessName.includes("OÜ"));
-
-      if (!isCorrectCompanyName) {
-        setErrorMessage(errormessage);
-        setDisplayErrorMessage(toDisplay);
-      } else {
-        setErrorMessage("The form might be faulty.");
-        setDisplayErrorMessage(false);
+      if (errorParams.fromWhere === "onFileChange") {
+        setErrorMessage(errorParams.message);
+        setDisplayErrorMessage(errorParams.toDisplay);
       }
     },
     [businessName]
@@ -32,32 +37,61 @@ const Form = () => {
       e.target.files[0].type === "application/vnd.ms-excel" ||
       e.target.files[0].type ===
         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+    setIsCorrectCsvFile(isCorrectFileType);
+    setDisplayErrorMessage(!(isCorrectCsvFile && isCorrectBusinessName));
     if (isCorrectFileType) {
       setCsvFile(e.target.files[0]);
-      console.log("Got correct file");
+      if (!isCorrectBusinessName) {
+        handleDisplayErrorMessage({
+          toDisplay: true,
+          message: `${businessName} isn't a correct business name. Make sure the name of the company is written correctly and contains the type of the business "OÜ" or "AS".`,
+          fromWhere: "onNameChange",
+        });
+        return;
+      }
+      setDisplayErrorMessage(false);
+      setToDisplayButton(true);
+      return;
     }
 
-    handleDisplayErrorMessage(
-      true,
-      "Make sure the file Your trying to insert is a .csv file."
-    );
+    handleDisplayErrorMessage({
+      toDisplay: true,
+      message: "Make sure the file Your trying to insert is a .csv file.",
+      fromWhere: "onFileChange",
+    });
   };
 
   useEffect(() => {
     const isCorrectCompanyName =
       businessName.length > 3 &&
       (businessName.includes("AS") || businessName.includes("OÜ"));
+    setIsCorrectBusinessName(isCorrectCompanyName);
     if (isCorrectCompanyName) {
-      handleDisplayErrorMessage(false, "The form might be faulty.");
+      if (!isCorrectCsvFile && csvFile.type) {
+        handleDisplayErrorMessage({
+          toDisplay: true,
+          message: "Make sure the file Your trying to insert is a .csv file.",
+          fromWhere: "onFileChange",
+        });
+        return;
+      }
+      setDisplayErrorMessage(false);
+      if (isCorrectCsvFile) {
+        setToDisplayButton(true);
+        return;
+      }
+      return;
     }
 
     if (businessName.length > 0) {
+      setToDisplayButton(false);
       const waitingForUser = setTimeout(() => {
-        handleDisplayErrorMessage(
-          true,
-          `${businessName} isn't a correct business name. Make sure the name of the company is written correctly and contains the type of the business "OÜ" or "AS".`
-        );
-      }, 2000);
+        handleDisplayErrorMessage({
+          toDisplay: true,
+          message: `${businessName} isn't a correct business name. Make sure the name of the company is written correctly and contains the type of the business "OÜ" or "AS".`,
+          fromWhere: "onNameChange",
+        });
+      }, 1500);
       return () => clearTimeout(waitingForUser);
     }
   }, [businessName, handleDisplayErrorMessage]);
@@ -103,9 +137,11 @@ const Form = () => {
           accept="application/vnd.openxmlformats"
         />
       </label>
-      <button className="bg-custom_purple border-solid border-2 border-[#001220] text-black sm:w-3/5 mx-auto rounded-md mt-4 p-1 font-medium text-xl">
-        Run checks
-      </button>
+      {toDisplayButton && (
+        <button className="bg-custom_purple border-solid border-2 border-[#001220] text-black sm:w-3/5 mx-auto rounded-md mt-4 p-1 font-medium text-xl">
+          Run checks
+        </button>
+      )}
     </form>
   );
 };
