@@ -6,7 +6,7 @@ import tutorialPic from "../../public/tutorial.png";
 export default function Home() {
   return (
     <div className="text-center">
-      <header className="min-[300px]:pt-15 md:pt-20 pt-10 sm:px-4 lg:px-8 mx-auto">
+      <header className="min-[300px]:pt-15 md:pt-20 pt-10 sm:px-4 lg:px-8 px-2 mx-auto">
         <h1 className="2xl:text-8xl lg:text-8xl text-3xl min-[300px]:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-custom_purple to-black">
           Audits of{" "}
           <span className="min-[1220px]:inline-block bg-black text-white px-1 rounded-md min-[1220px]:whitespace-nowrap">
@@ -18,7 +18,7 @@ export default function Home() {
         <p className="mb-8 2xl:text-8xl lg:text-8xl text-3xl min-[300px]:text-5xl font-bold min-[1020px]:-translate-y-4 bg-clip-text text-transparent bg-gradient-to-r from-custom_purple to-black">
           presence
         </p>
-        <p className="block text-lg min-[300px]:text-xl sm:w-4/5 sm:mx-auto mx-4">
+        <p className="block text-lg min-[300px]:text-xl sm:w-4/5 sm:mx-auto mx-4 mb-8">
           Audit Your or someone elses business&apos;s online accessibility and
           get feedback based off how easy it is to find You/them (SEO),
           website&apos;s performance and so on.
@@ -39,26 +39,28 @@ export default function Home() {
             would need improvement.
           </p>
         </section>
-        <section className="section-background h-fit w-9/12 mx-auto my-12 flex flex-col justify-center border-solid border-2 border-[#001220] rounded-md pt-8 pb-12">
+        <section className="section-background bg-custom_black h-fit w-5/6 lg:w-9/12 mx-auto my-12 flex flex-col justify-center border-solid border-2 border-custom_black rounded-md pt-8 pb-4 sm:pb-12">
           <h2 className="w-fit inline-block mx-auto -translate-y-4 text-4xl py-1 px-2 font-semibold bg-custom_purple text-white px-1 rounded-md mb-4">
             Lets Start here
           </h2>
-          <p className="text-lg font-medium bg-clip-text text-transparent bg-gradient-to-r from-white to-pink-500 -translate-y-6">
+          <p className="px-2 text-lg font-medium text-white sm:bg-clip-text sm:text-transparent sm:bg-gradient-to-r sm:from-white sm:to-pink-500 -translate-y-6">
             For instructions regarding the .csv file look down below.
           </p>
           <Form />
         </section>
-        <section className="bg-custom_purple/30 section-background border-solid border-t-2 border-custom_purple p-8">
-          <div className="backdrop-blur-sm bg-custom_purple/90 rounded-md w-11/12 mx-auto border-solid border-2 border-[#001220] p-8 pt-2">
+        <section className="bg-custom_black section-background border-solid border-t-2 border-custom_purple py-8">
+          <div className="backdrop-blur-sm bg-custom_purple/90 rounded-md w-5/6 mx-auto border-solid border-2 border-[#001220] p-2 sm:4 md:p-8 sm:pt-2">
             <h2 className="inline-block text-3xl font-semibold bg-black text-white px-1 rounded-md mt-6 mb-8">
               How to format the .csv file properly
             </h2>
-            <Image
-              src={tutorialPic}
-              alt="Example of the .csv file"
-              className="mx-auto w-4/5 max-w-[800px] rounded-md"
-            />
-            <p className="w-10/12 mx-auto mt-8 text-lg font-medium">
+            <div className="mx-auto max-w-4/5 overflow-x-auto">
+              <Image
+                src={tutorialPic}
+                alt="Example of the .csv file"
+                className="max-w-[800px] mx-auto min-w-[400px] rounded-md"
+              />
+            </div>
+            <p className="sm:w-10/12 mx-auto mt-8 text-lg font-medium">
               The &quot;name&quot; column should represent how the company is
               called, not its official name. The &quot;website&quot; column
               should include the company&apos;s website&apos;s address.

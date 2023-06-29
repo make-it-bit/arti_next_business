@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 const Form = () => {
   const [businessName, setBusinessName] = useState("");
   const [isCorrectBusinessName, setIsCorrectBusinessName] = useState(false);
-  const [csvFile, setCsvFile] = useState({});
+  const [csvFile, setCsvFile] = useState({ type: false });
   const [isCorrectCsvFile, setIsCorrectCsvFile] = useState(false);
   const [errorMessage, setErrorMessage] = useState("The form might be faulty.");
   const [displayErrorMessage, setDisplayErrorMessage] = useState(false);
@@ -44,7 +44,7 @@ const Form = () => {
       if (!isCorrectBusinessName) {
         handleDisplayErrorMessage({
           toDisplay: true,
-          message: `${businessName} isn't a correct business name. Make sure the name of the company is written correctly and contains the type of the business "OÜ" or "AS".`,
+          message: `"${businessName}" isn't a correct business name. Make sure the name of the company is written correctly and contains the type of the business "OÜ" or "AS".`,
           fromWhere: "onNameChange",
         });
         return;
@@ -89,17 +89,37 @@ const Form = () => {
       const waitingForUser = setTimeout(() => {
         handleDisplayErrorMessage({
           toDisplay: true,
-          message: `${businessName} isn't a correct business name. Make sure the name of the company is written correctly and contains the type of the business "OÜ" or "AS".`,
+          message: `"${businessName}" isn't a correct business name. Make sure the name of the company is written correctly and contains the type of the business "OÜ" or "AS".`,
           fromWhere: "onNameChange",
         });
       }, 1500);
       return () => clearTimeout(waitingForUser);
     }
     setDisplayErrorMessage(false);
-  }, [businessName, handleDisplayErrorMessage, isCorrectCsvFile]);
+  }, [businessName, handleDisplayErrorMessage, isCorrectCsvFile, csvFile]);
+
+  const submitHandler = (e) => {
+    e.preventDefault();
+    if (!(isCorrectCsvFile && isCorrectBusinessName)) {
+      alert("You provided some wrong details");
+    }
+
+    alert("Submitting:", csvFile, businessName);
+
+    setBusinessName("");
+    setIsCorrectBusinessName(false);
+    setCsvFile({ type: false });
+    setIsCorrectCsvFile(false);
+    setErrorMessage("The form might be faulty.");
+    setDisplayErrorMessage(false);
+    setToDisplayButton(true);
+  };
 
   return (
-    <form className="flex flex-col w-3/5 mx-auto ">
+    <form
+      className="flex flex-col w-4/5 md:w-3/5 mx-auto"
+      onSubmit={submitHandler}
+    >
       <div
         className="backdrop-blur-sm bg-white/20 rounded-md text-xl font-medium text-white p-2 mb-2"
         style={{ display: displayErrorMessage ? "block" : "none" }}
@@ -107,7 +127,7 @@ const Form = () => {
         <p>{errorMessage}</p>
       </div>
       <label
-        className="text-left text-xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-white to-pink-500"
+        className="sm:text-left text-xl font-medium text-white sm:bg-clip-text sm:text-transparent sm:bg-gradient-to-r sm:from-white sm:to-pink-500"
         htmlFor="business-name"
       >
         Official name of Your Business
@@ -128,7 +148,7 @@ const Form = () => {
       />
       <label
         htmlFor="csv_file"
-        className="bg-[#001220] border-solid border-2 border-custom_purple text-black rounded-md mt-2 p-1 font-medium text-xl"
+        className="bg-custom_black border-solid border-2 border-custom_purple text-black rounded-md mt-2 p-1 font-medium text-xl"
         style={{
           boxShadow: isCorrectCsvFile ? "5px 4px 10px #B43A7A" : "none",
         }}
@@ -148,11 +168,10 @@ const Form = () => {
           id="csv_file"
           name="file"
           onChange={(e) => onFileChange(e)}
-          accept="application/vnd.openxmlformats"
         />
       </label>
       {toDisplayButton && (
-        <button className="bg-custom_purple border-solid border-2 border-[#001220] text-black sm:w-3/5 mx-auto rounded-md mt-4 p-1 font-medium text-xl">
+        <button className="bg-custom_purple border-solid border-2 border-custom_black text-black sm:w-3/5 mx-auto rounded-md mt-4 p-1 font-medium text-xl">
           Run checks
         </button>
       )}
