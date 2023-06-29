@@ -25,6 +25,7 @@ body {
 
 .section-background {
   background-image: url("../../public/blob-scene-haikei.svg");
+  background-repeat: repeat-x;
 }
 
 @keyframes gradient {

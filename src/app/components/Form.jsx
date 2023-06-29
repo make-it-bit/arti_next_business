@@ -65,6 +65,7 @@ const Form = () => {
     const isCorrectCompanyName =
       businessName.length > 3 &&
       (businessName.includes("AS") || businessName.includes("OÜ"));
+    setBusinessName((name) => name.toUpperCase());
     setIsCorrectBusinessName(isCorrectCompanyName);
     if (isCorrectCompanyName) {
       if (!isCorrectCsvFile && csvFile.type) {
@@ -94,7 +95,8 @@ const Form = () => {
       }, 1500);
       return () => clearTimeout(waitingForUser);
     }
-  }, [businessName, handleDisplayErrorMessage]);
+    setDisplayErrorMessage(false);
+  }, [businessName, handleDisplayErrorMessage, isCorrectCsvFile]);
 
   return (
     <form className="flex flex-col w-3/5 mx-auto ">
@@ -108,23 +110,35 @@ const Form = () => {
         className="text-left text-xl font-medium bg-clip-text text-transparent bg-gradient-to-r from-white to-pink-500"
         htmlFor="business-name"
       >
-        Official name of the Business
+        Official name of Your Business
       </label>
       <input
         type="name"
-        placeholder='For example "AABITS OÜ"'
+        placeholder='For example "AABITS OÜ", needed for billing'
         id="business-name"
         name="businessName"
         required
         className="rounded-md py-1 px-2 mb-2 text-black font-medium focus:outline-none text-lg"
         value={businessName}
         onChange={(e) => setBusinessName(e.target.value)}
+        style={{
+          textShadow: isCorrectBusinessName ? "0 0 5px #B43A7A" : "none",
+          boxShadow: isCorrectBusinessName ? "5px 4px 10px #B43A7A" : "none",
+        }}
       />
       <label
         htmlFor="csv_file"
         className="bg-[#001220] border-solid border-2 border-custom_purple text-black rounded-md mt-2 p-1 font-medium text-xl"
+        style={{
+          boxShadow: isCorrectCsvFile ? "5px 4px 10px #B43A7A" : "none",
+        }}
       >
-        <span className="bg-clip-text text-transparent bg-gradient-to-r from-white to-pink-500">
+        <span
+          className="bg-clip-text text-transparent bg-gradient-to-r from-white to-pink-500"
+          style={{
+            textShadow: isCorrectCsvFile ? "0 0 5px #B43A7A" : "none",
+          }}
+        >
           Submit the correctly formatted CSV file here
         </span>
         <input

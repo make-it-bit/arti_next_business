@@ -1,4 +1,7 @@
 import Form from "./components/Form";
+import Image from "next/image";
+import Link from "next/link";
+import tutorialPic from "../../public/tutorial.png";
 
 export default function Home() {
   return (
@@ -40,7 +43,45 @@ export default function Home() {
           <h2 className="w-fit inline-block mx-auto -translate-y-4 text-4xl py-1 px-2 font-semibold bg-custom_purple text-white px-1 rounded-md mb-4">
             Lets Start here
           </h2>
+          <p className="text-lg font-medium bg-clip-text text-transparent bg-gradient-to-r from-white to-pink-500 -translate-y-6">
+            For instructions regarding the .csv file look down below.
+          </p>
           <Form />
+        </section>
+        <section className="bg-custom_purple/30 section-background border-solid border-t-2 border-custom_purple p-8">
+          <div className="backdrop-blur-sm bg-custom_purple/90 rounded-md w-11/12 mx-auto border-solid border-2 border-[#001220] p-8 pt-2">
+            <h2 className="inline-block text-3xl font-semibold bg-black text-white px-1 rounded-md mt-6 mb-8">
+              How to format the .csv file properly
+            </h2>
+            <Image
+              src={tutorialPic}
+              alt="Example of the .csv file"
+              className="mx-auto w-4/5 max-w-[800px] rounded-md"
+            />
+            <p className="w-10/12 mx-auto mt-8 text-lg font-medium">
+              The &quot;name&quot; column should represent how the company is
+              called, not its official name. The &quot;website&quot; column
+              should include the company&apos;s website&apos;s address.
+              &quot;used&quot; and &quot;new&quot; should provide true or false
+              value based on which type of cars the company sells, for example
+              if a company sells used cars, then it should be marked as
+              &quot;1&quot;, if not then &quot;0&quot;. The &quot;car park
+              size&quot; column should tell us how many cars does the company
+              have in its lot, acceptable values are as follows: any number from
+              1-100, 100+ (which marks any amount between 100 and 1000, 1000+
+              and 10000+ follow the same logic), 1000+ and 10000+. The
+              &quot;ärinimi&quot; column should provide us a name under which
+              the company is legally registered (found in the{" "}
+              <Link
+                href="https://www.inforegister.ee/"
+                rel="norefferer noopener"
+                className="underline"
+              >
+                Estonian Business Registry
+              </Link>
+              ).
+            </p>
+          </div>
         </section>
       </main>
     </div>
