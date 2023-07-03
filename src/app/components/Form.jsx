@@ -13,6 +13,7 @@ const Form = () => {
   const [toDisplayButton, setToDisplayButton] = useState(true);
   const [isFormSubmitted, setIsFormSubmitted] = useState(false);
   const [parsedCsv, setParsedCsv] = useState(false);
+  const [pageHasntLoaded, setPageHasntLoaded] = useState(true);
 
   const handleDisplayErrorMessage = useCallback(
     (errorParams) => {
@@ -63,6 +64,9 @@ const Form = () => {
   };
 
   useEffect(() => {
+    console.log("page has loaded");
+    setPageHasntLoaded(false);
+
     const isCorrectCompanyName =
       businessName.length > 3 &&
       (businessName.includes("AS") || businessName.includes("OÜ"));
@@ -127,7 +131,9 @@ const Form = () => {
       <form
         className="flex flex-col w-4/5 md:w-3/5 mx-auto"
         onSubmit={submitHandler}
-        style={{ display: isFormSubmitted ? "none" : "flex" }}
+        style={{
+          display: pageHasntLoaded || isFormSubmitted ? "none" : "flex",
+        }}
       >
         <div
           className="backdrop-blur-sm bg-white/20 rounded-md text-xl font-medium text-white p-2 mb-2"
@@ -185,6 +191,12 @@ const Form = () => {
           </button>
         )}
       </form>
+      <div
+        class="loader-container"
+        style={{ display: pageHasntLoaded ? "block" : "none" }}
+      >
+        <div class="loader"></div>
+      </div>
       <div style={{ display: isFormSubmitted ? "block" : "none" }}>
         <h3 className="text-2xl font-medium text-white">Form submitted</h3>
         {parsedCsv ? (
@@ -195,7 +207,7 @@ const Form = () => {
             Proceed
           </Link>
         ) : (
-          <p>
+          <p className="mx-auto w-4/5 text-xl text-white mt-4">
             An error occured parsing the file You provided, maybe check if its
             wrongly formatted and try again.
           </p>

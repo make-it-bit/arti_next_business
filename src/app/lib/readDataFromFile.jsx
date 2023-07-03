@@ -24,11 +24,11 @@ export const readCSVFile = (file) => {
       }
       const jsonData = JSON.stringify(parsedData);
       localStorage.setItem("carDealers", jsonData);
+      console.log(1);
       return "good";
     };
     return "error";
   } catch (e) {
-    alert("error");
     return "error";
   }
 };
