@@ -18,16 +18,15 @@ export const readCSVFile = (file) => {
           new: dataByRow[3] == "1",
           carParkSize: dataByRow[4],
           officialName: dataByRow[5].replace("\r", ""),
+          registerCode: dataByRow[6] ? dataByRow[6] : 0,
           index: i,
         };
         i++;
       }
       const jsonData = JSON.stringify(parsedData);
       localStorage.setItem("carDealers", jsonData);
-      console.log(1);
-      return "good";
     };
-    return "error";
+    return "good";
   } catch (e) {
     return "error";
   }

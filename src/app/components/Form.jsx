@@ -71,7 +71,7 @@ const Form = () => {
     }
 
     const successCode = readCSVFile(csvFile);
-    if (successCode !== "error") setParsedCsv(true);
+    if (successCode === "good") setParsedCsv(true);
 
     setIsFormSubmitted(true);
 
@@ -189,10 +189,10 @@ const Form = () => {
         )}
       </form>
       <div
-        class="loader-container"
+        className="loader-container"
         style={{ display: pageHasntLoaded ? "block" : "none" }}
       >
-        <div class="loader"></div>
+        <div className="loader"></div>
       </div>
       <div style={{ display: isFormSubmitted ? "block" : "none" }}>
         <h3 className="text-2xl font-medium text-white">Form submitted</h3>
