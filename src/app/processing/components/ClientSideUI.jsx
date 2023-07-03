@@ -1,5 +1,4 @@
 "use client";
-import { POST } from "@/app/api/crawler/route";
 import { useEffect, useState } from "react";
 
 const ClientSideUI = () => {

@@ -63,8 +63,28 @@ const Form = () => {
     });
   };
 
+  const submitHandler = async (e) => {
+    e.preventDefault();
+    if (!(isCorrectCsvFile && isCorrectBusinessName)) {
+      alert("You provided some wrong details");
+      return;
+    }
+
+    const successCode = readCSVFile(csvFile);
+    if (successCode !== "error") setParsedCsv(true);
+
+    setIsFormSubmitted(true);
+
+    setBusinessName("");
+    setIsCorrectBusinessName(false);
+    setCsvFile({ type: false });
+    setIsCorrectCsvFile(false);
+    setErrorMessage("The form might be faulty.");
+    setDisplayErrorMessage(false);
+    setToDisplayButton(true);
+  };
+
   useEffect(() => {
-    console.log("page has loaded");
     setPageHasntLoaded(false);
 
     const isCorrectCompanyName =
@@ -102,29 +122,6 @@ const Form = () => {
     }
     setDisplayErrorMessage(false);
   }, [businessName, handleDisplayErrorMessage, isCorrectCsvFile, csvFile]);
-
-  const submitHandler = async (e) => {
-    e.preventDefault();
-    if (!(isCorrectCsvFile && isCorrectBusinessName)) {
-      alert("You provided some wrong details");
-      return;
-    }
-
-    const successCode = readCSVFile(csvFile);
-    if (successCode !== "error") setParsedCsv(true);
-
-    setIsFormSubmitted(true);
-
-    setBusinessName("");
-    setIsCorrectBusinessName(false);
-    setCsvFile({ type: false });
-    setIsCorrectCsvFile(false);
-    setErrorMessage("The form might be faulty.");
-    setDisplayErrorMessage(false);
-    setToDisplayButton(true);
-
-    //parse the data in the csv file and show a loader, etc
-  };
 
   return (
     <>
