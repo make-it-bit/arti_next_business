@@ -19,9 +19,9 @@ export default function Home() {
           presence
         </p>
         <p className="block text-lg min-[300px]:text-xl sm:w-4/5 sm:mx-auto mx-4 mb-8">
-          Audit Your or someone elses business&apos;s online accessibility and
-          get feedback based off how easy it is to find You/them (SEO),
-          website&apos;s performance and so on.
+          Audit Your or someone elses business&apos;s (preferably a car
+          dealership) online accessibility and get feedback based off how easy
+          it is to find You/them (SEO), website&apos;s performance and so on.
         </p>
       </header>
       <main>
@@ -53,7 +53,7 @@ export default function Home() {
             <h2 className="inline-block text-3xl font-semibold bg-black text-white px-1 rounded-md mt-6 mb-8">
               How to format the .csv file properly
             </h2>
-            <div className="mx-auto max-w-4/5 overflow-x-auto">
+            <div className="mx-auto max-w-4/5 overflow-x-auto rounded-md">
               <Image
                 src={tutorialPic}
                 alt="Example of the .csv file"
