@@ -94,7 +94,7 @@ const scraper = async (dealers) => {
     i++;
     console.log(`Getting business data for i${i}`);
     //looking if its even possible to search for data
-    if (dealers[`i${i}`].registerCode === "") {
+    if (dealers[`i${i}`].registerCode === "-") {
       dealers[`i${i}`].representatives =
         "Couldn't fetch data on the Estonian business registry.";
       dealers[`i${i}`].businessDetails =

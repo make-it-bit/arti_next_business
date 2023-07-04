@@ -14,14 +14,18 @@ const makeAPICalls = async (dealers) => {
   while (i < Object.keys(dealers).length) {
     i++;
     console.log(`Getting Lighouse tests for i${i}`);
-    const response = await fetch(
-      `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${
-        dealers[`i${i}`].website
-      }&key=${process.env.GOOGLE_LIGHTHOUSE_API_KEY}`
-    );
-    const result = await response.json();
+    try {
+      const response = await fetch(
+        `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${
+          dealers[`i${i}`].website
+        }&key=${process.env.GOOGLE_LIGHTHOUSE_API_KEY}`
+      );
+      const result = await response.json();
 
-    improvedDealers[`i${i}`] = { lighthouseResults: result };
+      improvedDealers[`i${i}`] = { lighthouseResults: result };
+    } catch (e) {
+      improvedDealers[`i${i}`] = "Failed to generate tests";
+    }
   }
   return improvedDealers;
 };
