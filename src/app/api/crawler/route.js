@@ -83,6 +83,8 @@ const scrapeDetails = async (params) => {
 };
 
 const scraper = async (dealers) => {
+  if (typeof puppeteer === "undefined") return dealers;
+
   const browser = await puppeteer.launch({ headless: "new" });
   const page = await browser.newPage();
   page.setViewport({ width: 1280, height: 720 });
@@ -90,6 +92,7 @@ const scraper = async (dealers) => {
   let i = 0;
   while (i < Object.keys(dealers).length) {
     i++;
+    console.log(`Getting business data for i${i}`);
     //looking if its even possible to search for data
     if (dealers[`i${i}`].registerCode === "") {
       dealers[`i${i}`].representatives =
