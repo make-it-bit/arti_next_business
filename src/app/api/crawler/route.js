@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-const cheerio = require("cheerio");
 import puppeteer from "puppeteer";
 /*const puppeteer = require("puppeteer-extra");
 const StealthPlugin = require("puppeteer-extra-plugin-stealth");
@@ -32,7 +31,51 @@ const scrapeDetails = async (params) => {
     });
     params.dealer.contactDetails = contactDetails;
   } catch (e) {
-    params.dealer.contactDetails = "failed to fetch";
+    params.dealer.contactDetails = "Failed to fetch.";
+  }
+
+  //trying to get the amount of employees and revenue
+  try {
+    const businessDetails = await params.page.evaluate(() => {
+      const section = Array.from(
+        document.querySelectorAll('[class="h2"]')
+      ).filter((tag) => tag.innerText === "Maksualane info ")[0]
+        .nextElementSibling.children[0].children[1];
+
+      const taxedRevenue = section.children[3].children[1].innerText;
+
+      const amountOfEmployees = section.children[4].children[1].innerText;
+
+      return { taxedRevenue, amountOfEmployees };
+    });
+    params.dealer.businessDetails = businessDetails;
+  } catch (e) {
+    params.dealer.businessDetails = "Failed to fetch.";
+  }
+
+  //trying to get the representatives
+  try {
+    const representatives = await params.page.evaluate(() => {
+      const section = Array.from(
+        document.querySelectorAll('[class="col h2"]')
+      ).filter((tag) => tag.innerText === "Esindusõigus ")[0].parentElement
+        .parentElement.children[1].children[0].children[1];
+
+      const representatives = [];
+
+      let i = 0;
+      while (i < section.children.length) {
+        const representative = section.children[
+          i
+        ].children[0].innerText.replace(`\n' + `, "");
+        representatives.push(representative);
+        i++;
+      }
+      return representatives;
+    });
+    params.dealer.representatives = representatives;
+  } catch (e) {
+    params.dealer.representatives = "Failed to fetch.";
   }
 
   return params.dealer;
@@ -80,7 +123,7 @@ const scraper = async (dealers) => {
       await page.goto(companysUrl);
       await page.waitForTimeout(2000);
     } catch (e) {
-      console.log("This one has a sketchy name");
+      [`i${i}`].rikUrl = "Failed to generate.";
       continue;
     }
 
