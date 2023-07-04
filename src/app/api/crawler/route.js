@@ -1,21 +1,16 @@
 import { NextResponse } from "next/server";
 import puppeteer from "puppeteer";
-/*const puppeteer = require("puppeteer-extra");
-const StealthPlugin = require("puppeteer-extra-plugin-stealth");
-puppeteer.use(StealthPlugin());*/
 
 export const POST = async (req) => {
   const data = await req.json();
 
-  scraper(data);
+  const improvedData = await scraper(data);
 
-  return NextResponse.json({ Got: true });
+  return NextResponse.json(improvedData);
 };
 
 //SCRAPING SCRIPTS
 const scrapeDetails = async (params) => {
-  //e-mail, esindusisikud, kaive, tootajate arv, telo number, aadress
-
   //trying to get the contact details
   try {
     const contactDetails = await params.page.evaluate(() => {
@@ -23,7 +18,10 @@ const scrapeDetails = async (params) => {
         document.querySelectorAll('[class="h2 mb-1"]')
       ).filter((tag) => tag.innerText === "Kontaktid")[0].parentElement;
 
-      const address = section.children[1].children[1].innerText;
+      const address = section.children[1].children[1].innerText.replace(
+        " Ava kaart",
+        ""
+      );
       const email = section.children[2].children[1].innerText;
       const phoneNumber = section.children[4].children[1].innerText;
 
@@ -31,7 +29,8 @@ const scrapeDetails = async (params) => {
     });
     params.dealer.contactDetails = contactDetails;
   } catch (e) {
-    params.dealer.contactDetails = "Failed to fetch.";
+    params.dealer.contactDetails =
+      "Failed to fetch on the Estonian business registry.";
   }
 
   //trying to get the amount of employees and revenue
@@ -50,7 +49,8 @@ const scrapeDetails = async (params) => {
     });
     params.dealer.businessDetails = businessDetails;
   } catch (e) {
-    params.dealer.businessDetails = "Failed to fetch.";
+    params.dealer.businessDetails =
+      "Failed to fetch on the Estonian business registry.";
   }
 
   //trying to get the representatives
@@ -65,30 +65,41 @@ const scrapeDetails = async (params) => {
 
       let i = 0;
       while (i < section.children.length) {
-        const representative = section.children[
-          i
-        ].children[0].innerText.replace(`\n' + `, "");
-        representatives.push(representative);
+        const representative = section.children[i].children[0].innerText;
+        representatives.push(
+          representative.replaceAll(`\n`, "").replaceAll("  ", "")
+        );
         i++;
       }
       return representatives;
     });
     params.dealer.representatives = representatives;
   } catch (e) {
-    params.dealer.representatives = "Failed to fetch.";
+    params.dealer.representatives =
+      "Failed to fetch on the Estonian business registry.";
   }
 
   return params.dealer;
 };
 
 const scraper = async (dealers) => {
-  const browser = await puppeteer.launch({ headless: false });
+  const browser = await puppeteer.launch({ headless: "new" });
   const page = await browser.newPage();
   page.setViewport({ width: 1280, height: 720 });
 
-  let i = 1;
-  while (i <= Object.keys(dealers).length) {
-    console.log(`Processing item i${i}`);
+  let i = 0;
+  while (i < Object.keys(dealers).length) {
+    i++;
+    //looking if its even possible to search for data
+    if (dealers[`i${i}`].registerCode === "") {
+      dealers[`i${i}`].representatives =
+        "Couldn't fetch data on the Estonian business registry.";
+      dealers[`i${i}`].businessDetails =
+        "Couldn't fetch data on the Estonian business registry.";
+      dealers[`i${i}`].contactDetails =
+        "Couldn't fetch data on the Estonian business registry.";
+      continue;
+    }
 
     //trying to get to its page if possible
     try {
@@ -96,22 +107,14 @@ const scraper = async (dealers) => {
       await page.type("#company_search", dealers[`i${i}`].officialName);
       await page.click(".btn-primary");
       await page.waitForTimeout(500);
+
       //getting the url
       const rikUrlCode = await page.evaluate(() => {
         return document.location.pathname.slice(-7);
       });
 
       const nameFormattor = (name) => {
-        const nameArray = name.split(" ");
-        let formattedName = nameArray[0];
-
-        let i = 1;
-        while (i < nameArray.length) {
-          formattedName += `-${nameArray[i]}`;
-          i++;
-        }
-
-        return formattedName;
+        return name.replaceAll(" ", "-");
       };
 
       const formattedName = nameFormattor(dealers[`i${i}`].officialName);
@@ -123,69 +126,26 @@ const scraper = async (dealers) => {
       await page.goto(companysUrl);
       await page.waitForTimeout(2000);
     } catch (e) {
-      [`i${i}`].rikUrl = "Failed to generate.";
-      continue;
+      dealers[`i${i}`].rikUrl = "Failed to generate.";
     }
 
-    //scraping as much details as possible
-    const dealerWithNewData = await scrapeDetails({
-      page,
-      dealer: dealers[`i${i}`],
-    });
-    dealers[`i${i}`] = dealerWithNewData;
-
-    i++;
+    //reducing the amount of bandwidth used up by the function by making less requests if possible
+    if (dealers[`i${i}`].rikUrl !== "Failed to generate.") {
+      //scraping as much details as possible
+      const dealerWithNewData = await scrapeDetails({
+        page,
+        dealer: dealers[`i${i}`],
+      });
+      dealers[`i${i}`] = dealerWithNewData;
+    } else {
+      dealers[`i${i}`].representatives =
+        "Failed to fetch on the Estonian business registry.";
+      dealers[`i${i}`].businessDetails =
+        "Failed to fetch on the Estonian business registry.";
+      dealers[`i${i}`].contactDetails =
+        "Failed to fetch on the Estonian business registry.";
+    }
   }
-  console.log(dealers);
+  browser.close();
+  return dealers;
 };
-
-/*
-//PUPPETEER'S SCRIPTS
-const mainPuppeteer = async (dealers) => {
-  const browser = await puppeteer.launch({ headless: false });
-  const page = await browser.newPage();
-  page.setViewport({ width: 1280, height: 720 });
-
-  let i = 1;
-
-  //looping over the dealers
-  while (i <= Object.keys(dealers).length) {
-    console.log(`Processing item i${i}`);
-
-    await page.goto("https://ariregister.rik.ee/est");
-
-    await page.type("#company_search", dealers[`i${i}`].officialName);
-    await page.click(".btn-primary");
-    await page.waitForTimeout(1000);
-
-    //getting another link
-    let linkToDealersPage;
-    /*try {
-      linkToDealersPage = await page.$eval(
-        //".ar__center > div > div:nth-child(1) a",
-        ".ar__center__bg .ar__center > div > div > div:nth-child(2) > table a",
-        (a) => {
-          return a.href;
-        }
-      );
-      console.log("no error");
-    } catch (e) {*/
-/*linkToDealersPage = await page.$eval(".card-body > a", (a) => {
-      return a.href;
-    });
-    linkToDealersPage = await page.$eval(".ar__center > div > div", (div) => {
-      const linkElement = div.querySelector(".card-body > a");
-      return linkElement.href;
-    });
-
-    console.log(linkToDealersPage);
-    //}
-
-    await page.goto(linkToDealersPage);
-
-    break;
-    i++;
-  }
-};
-
-//getting the data of one dealer*/

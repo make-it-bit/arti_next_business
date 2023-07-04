@@ -23,8 +23,9 @@ const ClientSideUI = () => {
 
     const getLightHouseData = new Promise(async (resolve) => {
       console.log("Calling the lighthouse API with the same data");
+
       const responseWithStats = await fetch(
-        "http://localhost:3000/api/crawler",
+        "http://localhost:3000/api/lighthouse",
         {
           method: "POST",
           body: data,
@@ -47,6 +48,7 @@ const ClientSideUI = () => {
   };
 
   useEffect(() => {
+    //wait for getData to finish and then start generating the csv file with the new values
     getData();
   }, []);
 

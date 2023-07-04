@@ -18,7 +18,7 @@ export const readCSVFile = (file) => {
           new: dataByRow[3] == "1",
           carParkSize: dataByRow[4],
           officialName: dataByRow[5].replace("\r", ""),
-          registerCode: dataByRow[6] ? dataByRow[6] : 0,
+          registerCode: dataByRow[6] ? dataByRow[6].replace("\r", "") : "",
           index: i,
         };
         i++;

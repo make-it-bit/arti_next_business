@@ -14,8 +14,6 @@ export const middleware = (request) => {
     });
   }
 
-  console.log("middleware called");
-
   return NextResponse.next();
 };
 
