@@ -14,8 +14,28 @@ export const POST = async (req) => {
 };
 
 //SCRAPING SCRIPTS
-const scrapeDetails = () => {
+const scrapeDetails = async (params) => {
   //e-mail, esindusisikud, kaive, tootajate arv, telo number, aadress
+
+  //trying to get the contact details
+  try {
+    const contactDetails = await params.page.evaluate(() => {
+      const section = Array.from(
+        document.querySelectorAll('[class="h2 mb-1"]')
+      ).filter((tag) => tag.innerText === "Kontaktid")[0].parentElement;
+
+      const address = section.children[1].children[1].innerText;
+      const email = section.children[2].children[1].innerText;
+      const phoneNumber = section.children[4].children[1].innerText;
+
+      return { address, email, phoneNumber };
+    });
+    params.dealer.contactDetails = contactDetails;
+  } catch (e) {
+    params.dealer.contactDetails = "failed to fetch";
+  }
+
+  return params.dealer;
 };
 
 const scraper = async (dealers) => {
@@ -27,14 +47,12 @@ const scraper = async (dealers) => {
   while (i <= Object.keys(dealers).length) {
     console.log(`Processing item i${i}`);
 
-    await page.goto("https://ariregister.rik.ee/est");
-
-    await page.type("#company_search", dealers[`i${i}`].officialName);
-    await page.click(".btn-primary");
-    await page.waitForTimeout(400);
-
-    //trying to get to its url if possible
+    //trying to get to its page if possible
     try {
+      await page.goto("https://ariregister.rik.ee/est");
+      await page.type("#company_search", dealers[`i${i}`].officialName);
+      await page.click(".btn-primary");
+      await page.waitForTimeout(500);
       //getting the url
       const rikUrlCode = await page.evaluate(() => {
         return document.location.pathname.slice(-7);
@@ -66,15 +84,16 @@ const scraper = async (dealers) => {
       continue;
     }
 
-    //proovida taieliku URL-ga puppeteeri uuesti toole saada
-    /*const response = await fetch(
-      `URL registrikoodi ja puppeeterilt saadud url koodi pohjal`
-    );
-    const htmlString = await response.text();
-    const $ = cheerio.load(htmlString);*/
+    //scraping as much details as possible
+    const dealerWithNewData = await scrapeDetails({
+      page,
+      dealer: dealers[`i${i}`],
+    });
+    dealers[`i${i}`] = dealerWithNewData;
 
     i++;
   }
+  console.log(dealers);
 };
 
 /*
