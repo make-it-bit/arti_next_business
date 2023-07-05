@@ -4,6 +4,8 @@ import puppeteer from "puppeteer";
 export const POST = async (req) => {
   const data = await req.json();
 
+  console.log("Called crawler");
+
   const improvedData = await scraper(data);
 
   return NextResponse.json(improvedData);
@@ -90,9 +92,10 @@ const scraper = async (dealers) => {
   page.setViewport({ width: 1280, height: 720 });
 
   let i = 0;
-  while (i < Object.keys(dealers).length) {
+  //-1 because of user object
+  while (i < Object.keys(dealers).length - 1) {
     i++;
-    console.log(`Getting business data for i${i}`);
+    //console.log(`Getting business data for i${i}`);
     //looking if its even possible to search for data
     if (dealers[`i${i}`].registerCode === "-") {
       dealers[`i${i}`].representatives =

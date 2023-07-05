@@ -4,17 +4,32 @@ import { useEffect, useState } from "react";
 const ClientSideUI = () => {
   const [objectOfCompanys, setobjectOfCompanys] = useState({});
   const [gotResponse, setGotResponse] = useState(false);
+  const [errorText, setErrorText] = useState(
+    "An error may have occured because there are no results to show."
+  );
 
   const getData = async () => {
-    const data = localStorage.getItem("carDealers");
+    const data = JSON.parse(localStorage.getItem("carDealers"));
+    let ip;
+    try {
+      const response = await fetch("https://api.ipify.org?format=json");
+      const ipData = await response.json();
+      ip = ipData;
+      data.user = ip;
+    } catch (error) {
+      alert(
+        "Failed to start fetching scripts, make sure Your browser is allright"
+      );
+      setGotResponse(true);
+      return;
+    }
 
     const getCrawlerData = new Promise(async (resolve) => {
-      console.log("Calling the crawler API with", data);
       const responseWithStats = await fetch(
         "http://localhost:3000/api/crawler",
         {
           method: "POST",
-          body: data,
+          body: JSON.stringify(data),
         }
       );
       const dataWithStats = await responseWithStats.json();
@@ -22,13 +37,11 @@ const ClientSideUI = () => {
     });
 
     const getLightHouseData = new Promise(async (resolve) => {
-      console.log("Calling the lighthouse API with the same data");
-
       const responseWithStats = await fetch(
         "http://localhost:3000/api/lighthouse",
         {
           method: "POST",
-          body: data,
+          body: JSON.stringify(data),
         }
       );
       const dataWithStats = await responseWithStats.json();
@@ -41,10 +54,17 @@ const ClientSideUI = () => {
         getLightHouseData,
       ]);
 
+      console.log(allDataWithStats);
+      if (allDataWithStats[0].error || allDataWithStats[1].error) {
+        setErrorText(allDataWithStats[0].error || allDataWithStats[1].error);
+        setGotResponse(true);
+        return;
+      }
+
       const finalObject = allDataWithStats[0];
       let i = 1;
 
-      while (i <= Object.keys(finalObject).length) {
+      while (i <= Object.keys(finalObject).length - 1) {
         finalObject[`i${i}`].lightHouseData =
           allDataWithStats[1][`i${i}`].lighthouseResults;
 
@@ -96,13 +116,7 @@ const ClientSideUI = () => {
   const ShowResults = () => {
     return (
       <div>
-        {objectOfCompanys.i1 ? (
-          <p>Got results </p>
-        ) : (
-          <p>
-            An error may have occured, because there are no results to show.
-          </p>
-        )}
+        {objectOfCompanys.i1 ? <p>Got results </p> : <p>{errorText}</p>}
       </div>
     );
   };
@@ -113,7 +127,10 @@ const ClientSideUI = () => {
           <ShowResults />
         ) : (
           <div>
-            <p>We&apos;re processing the data, please wait.</p>
+            <p>
+              We&apos;re processing the data, please don&apos;t refresh the
+              page.
+            </p>
           </div>
         )}
       </section>

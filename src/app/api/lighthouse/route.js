@@ -2,6 +2,9 @@ import { NextResponse } from "next/server";
 
 export const POST = async (req) => {
   const data = await req.json();
+
+  console.log("Called lighthouse");
+
   const improvedData = await makeAPICalls(data);
   return NextResponse.json(improvedData);
 };
@@ -11,9 +14,10 @@ const makeAPICalls = async (dealers) => {
   const improvedDealers = {};
 
   let i = 0;
-  while (i < Object.keys(dealers).length) {
+  //-1 because of user objects
+  while (i < Object.keys(dealers).length - 1) {
     i++;
-    console.log(`Getting Lighouse tests for i${i}`);
+    //console.log(`Getting Lighouse tests for i${i}`);
     try {
       const response = await fetch(
         `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${
