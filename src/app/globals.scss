@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+$custom_purple: #B43A7A;
+$custom_black: #001220;
+
 body {
   background: rgb(238, 174, 202);
   background: radial-gradient(
@@ -29,8 +32,8 @@ body {
 }
 
 .loader {
-  border: 16px solid #001220;
-  border-top: 16px solid #b43a7a;
+  border: 16px solid $custom_purple;
+  border-top: 16px solid $custom_black;
   border-radius: 50%;
   width: 130px;
   height: 130px;
@@ -39,7 +42,12 @@ body {
 }
 
 .text-shadow {
-  text-shadow: 1px 1px 2px black;
+  text-shadow: 1px 1px 2px $custom_black;
+}
+
+.correct-input {
+  text-shadow: 0 0 5px $custom_purple;
+  box-shadow: 5px 4px 10px $custom_purple;
 }
 
 @keyframes spin {

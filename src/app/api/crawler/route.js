@@ -6,16 +6,16 @@ export const POST = async (req) => {
 
   console.log("Called crawler");
 
-  const improvedData = await scraper(data);
+  const improvedData = await scraper(data.csvFileData);
 
   return NextResponse.json(improvedData);
 };
 
 //SCRAPING SCRIPTS
-const scrapeDetails = async (params) => {
+const scrapeDetails = async ({ page, dealer }) => {
   //trying to get the contact details
   try {
-    const contactDetails = await params.page.evaluate(() => {
+    const contactDetails = await page.evaluate(() => {
       const section = Array.from(
         document.querySelectorAll('[class="h2 mb-1"]')
       ).filter((tag) => tag.innerText === "Kontaktid")[0].parentElement;
@@ -29,15 +29,19 @@ const scrapeDetails = async (params) => {
 
       return { address, email, phoneNumber };
     });
-    params.dealer.contactDetails = contactDetails;
-  } catch (e) {
-    params.dealer.contactDetails =
-      "Failed to fetch on the Estonian business registry.";
+    dealer.contactDetails = contactDetails;
+  } catch (err) {
+    const contactDetails = {
+      address: err.message,
+      email: err.message,
+      phoneNumber: err.message,
+    };
+    dealer.contactDetails = contactDetails;
   }
 
   //trying to get the amount of employees and revenue
   try {
-    const businessDetails = await params.page.evaluate(() => {
+    const businessDetails = await page.evaluate(() => {
       const section = Array.from(
         document.querySelectorAll('[class="h2"]')
       ).filter((tag) => tag.innerText === "Maksualane info ")[0]
@@ -49,15 +53,18 @@ const scrapeDetails = async (params) => {
 
       return { taxedRevenue, amountOfEmployees };
     });
-    params.dealer.businessDetails = businessDetails;
-  } catch (e) {
-    params.dealer.businessDetails =
-      "Failed to fetch on the Estonian business registry.";
+    dealer.businessDetails = businessDetails;
+  } catch (err) {
+    const businessDetails = {
+      taxedRevenue: err.message,
+      amountOfEmployees: err.message,
+    };
+    dealer.businessDetails = businessDetails;
   }
 
   //trying to get the representatives
   try {
-    const representatives = await params.page.evaluate(() => {
+    const representatives = await page.evaluate(() => {
       const section = Array.from(
         document.querySelectorAll('[class="col h2"]')
       ).filter((tag) => tag.innerText === "Esindusõigus ")[0].parentElement
@@ -75,42 +82,49 @@ const scrapeDetails = async (params) => {
       }
       return representatives;
     });
-    params.dealer.representatives = representatives;
-  } catch (e) {
-    params.dealer.representatives =
-      "Failed to fetch on the Estonian business registry.";
+    dealer.representatives = representatives;
+  } catch (err) {
+    dealer.representatives = [err.message];
   }
 
-  return params.dealer;
+  return dealer;
 };
 
 const scraper = async (dealers) => {
-  if (typeof puppeteer === "undefined") return dealers;
-
   const browser = await puppeteer.launch({ headless: "new" });
   const page = await browser.newPage();
   page.setViewport({ width: 1280, height: 720 });
 
   let i = 0;
-  //-1 because of user object
-  while (i < Object.keys(dealers).length - 1) {
-    i++;
-    //console.log(`Getting business data for i${i}`);
+  while (i < dealers.length) {
+    console.log(`Getting business data for ${i + 1}/${dealers.length}`);
     //looking if its even possible to search for data
-    if (dealers[`i${i}`].registerCode === "-") {
-      dealers[`i${i}`].representatives =
-        "Couldn't fetch data on the Estonian business registry.";
-      dealers[`i${i}`].businessDetails =
-        "Couldn't fetch data on the Estonian business registry.";
-      dealers[`i${i}`].contactDetails =
-        "Couldn't fetch data on the Estonian business registry.";
+    if (dealers[i].registerCode === "-") {
+      dealers[i].representatives = [
+        "Couldn't fetch data on the Estonian business registry, because You didn't include the register code in the CSV file.",
+      ];
+      dealers[i].businessDetails = {
+        taxedRevenue:
+          "Couldn't fetch data on the Estonian business registry, because You didn't include the register code in the CSV file.",
+        amountOfEmployees:
+          "Couldn't fetch data on the Estonian business registry, because You didn't include the register code in the CSV file.",
+      };
+      dealers[i].contactDetails = {
+        address:
+          "Couldn't fetch data on the Estonian business registry, because You didn't include the register code in the CSV file.",
+        email:
+          "Couldn't fetch data on the Estonian business registry, because You didn't include the register code in the CSV file.",
+        phoneNumber:
+          "Couldn't fetch data on the Estonian business registry, because You didn't include the register code in the CSV file.",
+      };
+      i++;
       continue;
     }
 
     //trying to get to its page if possible
     try {
       await page.goto("https://ariregister.rik.ee/est");
-      await page.type("#company_search", dealers[`i${i}`].officialName);
+      await page.type("#company_search", dealers[i].officialName);
       await page.click(".btn-primary");
       await page.waitForTimeout(500);
 
@@ -123,34 +137,44 @@ const scraper = async (dealers) => {
         return name.replaceAll(" ", "-");
       };
 
-      const formattedName = nameFormattor(dealers[`i${i}`].officialName);
-      const companysUrl = `https://ariregister.rik.ee/est/company/${
-        dealers[`i${i}`].registerCode
-      }/${formattedName}?search_id=${rikUrlCode}&pos=1`;
-      dealers[`i${i}`].rikUrl = companysUrl;
+      const formattedName = nameFormattor(dealers[i].officialName);
+      const companysUrl = `https://ariregister.rik.ee/est/company/${dealers[i].registerCode}/${formattedName}?search_id=${rikUrlCode}&pos=1`;
+      dealers[i].rikUrl = companysUrl;
 
       await page.goto(companysUrl);
       await page.waitForTimeout(2000);
     } catch (e) {
-      dealers[`i${i}`].rikUrl = "Failed to generate.";
+      dealers[i].rikUrl = "Failed to generate.";
     }
 
     //reducing the amount of bandwidth used up by the function by making less requests if possible
-    if (dealers[`i${i}`].rikUrl !== "Failed to generate.") {
+    if (dealers[i].rikUrl !== "Failed to generate.") {
       //scraping as much details as possible
       const dealerWithNewData = await scrapeDetails({
         page,
-        dealer: dealers[`i${i}`],
+        dealer: dealers[i],
       });
-      dealers[`i${i}`] = dealerWithNewData;
+      dealers[i] = dealerWithNewData;
     } else {
-      dealers[`i${i}`].representatives =
-        "Failed to fetch on the Estonian business registry.";
-      dealers[`i${i}`].businessDetails =
-        "Failed to fetch on the Estonian business registry.";
-      dealers[`i${i}`].contactDetails =
-        "Failed to fetch on the Estonian business registry.";
+      dealers[i].representatives = [
+        "Failed access the companys personal page on RIK, because we failed to generate an acceptable RIK url.",
+      ];
+      dealers[i].businessDetails = {
+        taxedRevenue:
+          "Failed access the companys personal page on RIK, because we failed to generate an acceptable RIK url.",
+        amountOfEmployees:
+          "Failed access the companys personal page on RIK, because we failed to generate an acceptable RIK url.",
+      };
+      dealers[i].contactDetails = {
+        address:
+          "Failed access the companys personal page on RIK, because we failed to generate an acceptable RIK url.",
+        email:
+          "Failed access the companys personal page on RIK, because we failed to generate an acceptable RIK url.",
+        phoneNumber:
+          "Failed access the companys personal page on RIK, because we failed to generate an acceptable RIK url.",
+      };
     }
+    i++;
   }
   browser.close();
   return dealers;

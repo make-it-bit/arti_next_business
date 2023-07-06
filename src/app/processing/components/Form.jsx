@@ -1,9 +1,7 @@
 "use client";
 import { useState, useEffect, useCallback } from "react";
-import Link from "next/link";
-import { readCSVFile } from "../lib/readDataFromFile";
 
-const Form = () => {
+const Form = ({ getDataFromCSVFile, setIsFormSubmitted }) => {
   const [businessName, setBusinessName] = useState("");
   const [isCorrectBusinessName, setIsCorrectBusinessName] = useState(false);
   const [csvFile, setCsvFile] = useState({ type: false });
@@ -11,8 +9,6 @@ const Form = () => {
   const [errorMessage, setErrorMessage] = useState("The form might be faulty.");
   const [displayErrorMessage, setDisplayErrorMessage] = useState(false);
   const [toDisplayButton, setToDisplayButton] = useState(true);
-  const [isFormSubmitted, setIsFormSubmitted] = useState(false);
-  const [parsedCsv, setParsedCsv] = useState(false);
   const [pageHasntLoaded, setPageHasntLoaded] = useState(true);
 
   const handleDisplayErrorMessage = useCallback(
@@ -70,10 +66,7 @@ const Form = () => {
       return;
     }
 
-    const successCode = readCSVFile(csvFile);
-    if (successCode === "good") setParsedCsv(true);
-
-    setIsFormSubmitted(true);
+    getDataFromCSVFile(csvFile);
 
     setBusinessName("");
     setIsCorrectBusinessName(false);
@@ -82,6 +75,8 @@ const Form = () => {
     setErrorMessage("The form might be faulty.");
     setDisplayErrorMessage(false);
     setToDisplayButton(true);
+
+    setIsFormSubmitted(true);
   };
 
   useEffect(() => {
@@ -126,15 +121,15 @@ const Form = () => {
   return (
     <>
       <form
-        className="flex flex-col w-4/5 md:w-3/5 mx-auto"
+        className={`flex flex-col w-4/5 md:w-3/5 mx-auto ${
+          pageHasntLoaded && "hidden"
+        }`}
         onSubmit={submitHandler}
-        style={{
-          display: pageHasntLoaded || isFormSubmitted ? "none" : "flex",
-        }}
       >
         <div
-          className="backdrop-blur-sm bg-white/20 rounded-md text-xl font-medium text-white p-2 mb-2"
-          style={{ display: displayErrorMessage ? "block" : "none" }}
+          className={`backdrop-blur-sm bg-white/20 rounded-md text-xl font-medium text-white p-2 mb-2 ${
+            !displayErrorMessage && "hidden"
+          }`}
         >
           <p>{errorMessage}</p>
         </div>
@@ -150,27 +145,20 @@ const Form = () => {
           id="business-name"
           name="businessName"
           required
-          className="rounded-md py-1 px-2 mb-2 text-black font-medium focus:outline-none text-lg"
+          className={`rounded-md py-1 px-2 mb-2 text-black font-medium focus:outline-none text-lg ${
+            isCorrectBusinessName && "correct-input"
+          }`}
           value={businessName}
           onChange={(e) => setBusinessName(e.target.value)}
-          style={{
-            textShadow: isCorrectBusinessName ? "0 0 5px #B43A7A" : "none",
-            boxShadow: isCorrectBusinessName ? "5px 4px 10px #B43A7A" : "none",
-          }}
+          style={{}}
         />
         <label
           htmlFor="csv_file"
-          className="bg-custom_black border-solid border-2 border-custom_purple text-black rounded-md mt-2 p-1 font-medium text-xl"
-          style={{
-            boxShadow: isCorrectCsvFile ? "5px 4px 10px #B43A7A" : "none",
-          }}
+          className={`bg-custom_black border-solid border-2 border-custom_purple text-black rounded-md mt-2 p-1 font-medium text-xl ${
+            isCorrectCsvFile && "correct-input"
+          }`}
         >
-          <span
-            className="bg-clip-text text-transparent bg-gradient-to-r from-white to-pink-500"
-            style={{
-              textShadow: isCorrectCsvFile ? "0 0 5px #B43A7A" : "none",
-            }}
-          >
+          <span className="bg-clip-text text-transparent bg-gradient-to-r from-white to-pink-500">
             Submit the correctly formatted CSV file here
           </span>
           <input
@@ -188,27 +176,8 @@ const Form = () => {
           </button>
         )}
       </form>
-      <div
-        className="loader-container"
-        style={{ display: pageHasntLoaded ? "block" : "none" }}
-      >
+      <div className={`loader-container ${!pageHasntLoaded && "hidden"}`}>
         <div className="loader"></div>
-      </div>
-      <div style={{ display: isFormSubmitted ? "block" : "none" }}>
-        <h3 className="text-2xl font-medium text-white">Form submitted</h3>
-        {parsedCsv ? (
-          <Link
-            className="block my-4 bg-custom_purple border-solid border-2 border-custom_black text-black sm:w-3/5 mx-auto rounded-md mt-4 p-1 font-medium text-xl"
-            href="/processing"
-          >
-            Proceed
-          </Link>
-        ) : (
-          <p className="mx-auto w-4/5 text-xl text-white mt-4">
-            An error occured parsing the file You provided, maybe check if its
-            wrongly formatted and try again.
-          </p>
-        )}
       </div>
     </>
   );

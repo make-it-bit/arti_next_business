@@ -1,4 +1,3 @@
-import Form from "./components/Form";
 import Image from "next/image";
 import Link from "next/link";
 import tutorialPic from "../../public/tutorial.png";
@@ -25,7 +24,7 @@ export default function Home() {
         </p>
       </header>
       <main>
-        <section className="md:my-12 md:px-6 md:py-4 w-5/6 md:w-4/5 lg:w-3/5 mx-auto backdrop-blur-sm rounded-md px-2 py-2 border-solid border-2 border-custom_purple ">
+        <div className="md:my-12 md:px-6 md:py-4 w-5/6 md:w-4/5 lg:w-3/5 mx-auto backdrop-blur-sm rounded-md px-2 py-2 border-solid border-2 border-custom_purple ">
           <h2 className="inline-block text-3xl font-semibold bg-black text-white px-1 rounded-md mb-4">
             How we can help You
           </h2>
@@ -38,17 +37,23 @@ export default function Home() {
             website. After that we process the results and let You know what
             would need improvement.
           </p>
-        </section>
-        <section className="section-background bg-custom_black h-fit w-5/6 lg:w-9/12 mx-auto my-12 flex flex-col justify-center border-solid border-2 border-custom_black rounded-md pt-8 pb-4 sm:pb-12">
+        </div>
+        <div className="section-background bg-custom_black h-fit w-5/6 lg:w-9/12 mx-auto my-12 flex flex-col justify-center border-solid border-2 border-custom_black rounded-md pt-8 pb-4 sm:pb-12">
           <h2 className="w-fit inline-block mx-auto -translate-y-4 text-4xl py-1 px-2 font-semibold bg-custom_purple text-white px-1 rounded-md mb-4">
             Lets Start here
           </h2>
           <p className="px-2 text-lg font-medium text-white sm:bg-clip-text sm:text-transparent sm:bg-gradient-to-r sm:from-white sm:to-pink-500 -translate-y-6">
             For instructions regarding the .csv file look down below.
           </p>
-          <Form />
-        </section>
-        <section className="bg-custom_black section-background border-solid border-t-2 border-custom_purple py-8">
+          <Link
+            href="/processing"
+            title="Proceed"
+            className="block my-4 bg-custom_purple border-solid border-2 border-custom_black text-black sm:w-3/5 mx-auto rounded-md mt-4 p-1 font-medium text-2xl"
+          >
+            Proceed
+          </Link>
+        </div>
+        <div className="bg-custom_black section-background border-solid border-t-2 border-custom_purple py-8">
           <div className="backdrop-blur-sm bg-custom_purple/90 rounded-md w-5/6 mx-auto border-solid border-2 border-[#001220] p-2 sm:4 md:p-8 sm:pt-2">
             <h2 className="inline-block text-3xl font-semibold bg-black text-white px-1 rounded-md mt-6 mb-8">
               How to format the .csv file properly
@@ -84,7 +89,7 @@ export default function Home() {
               ).
             </p>
           </div>
-        </section>
+        </div>
       </main>
     </div>
   );

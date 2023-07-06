@@ -9,21 +9,21 @@ export const middleware = async (request) => {
   const requestOrigin = request.headers.get("origin");
 
   const data = await request.json();
-  objectWithIps[data.user.ip] =
-    typeof objectWithIps[data.user.ip] === "undefined"
-      ? (objectWithIps[data.user.ip] = 1)
-      : (objectWithIps[data.user.ip] += 1);
+  objectWithIps[data.userIp] =
+    typeof objectWithIps[data.userIp] === "undefined"
+      ? (objectWithIps[data.userIp] = 1)
+      : (objectWithIps[data.userIp] += 1);
   console.log(objectWithIps);
 
-  if (objectWithIps[data.user.ip] > 4) {
+  if (
+    objectWithIps[data.userIp] > 10 ||
+    typeof objectWithIps[data.userIp] === "undefined"
+  ) {
     console.log("Triggered limiter");
-    return NextResponse.json(
-      { error: "You made too many requests in a 10 minute period" },
-      {
-        status: 400,
-        statusText: "API limiter triggered",
-      }
-    );
+    return new NextResponse(null, {
+      status: 400,
+      statusText: "API limiter triggered",
+    });
   }
 
   if (requestOrigin === process.env.CURRENT_URL) {

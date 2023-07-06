@@ -8,7 +8,9 @@ const Page = () => {
           The results will appear here
         </h1>
       </header>
-      <ClientSideUI />
+      <main>
+        <ClientSideUI />
+      </main>
     </div>
   );
 };

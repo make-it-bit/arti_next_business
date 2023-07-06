@@ -1,17 +1,17 @@
-export const readCSVFile = (file) => {
+const readCSVFile = (file) => {
+  let parsedData = [];
   try {
     const reader = new FileReader();
     reader.readAsText(file);
 
     reader.onload = (e) => {
-      let parsedData = {};
       const csvdata = e.target.result;
       const rowData = csvdata.split("\n");
 
       let i = 1;
       while (i < rowData.length) {
         const dataByRow = rowData[i].split(",");
-        parsedData[`i${i}`] = {
+        parsedData.push({
           name: dataByRow[0],
           website: dataByRow[1],
           used: dataByRow[2] == "1",
@@ -20,14 +20,14 @@ export const readCSVFile = (file) => {
           officialName: dataByRow[5]?.replace("\r", ""),
           registerCode: dataByRow[6]?.replace("\r", ""),
           index: i,
-        };
+        });
         i++;
       }
-      const jsonData = JSON.stringify(parsedData);
-      localStorage.setItem("carDealers", jsonData);
     };
-    return "good";
+    return parsedData;
   } catch (e) {
-    return "error";
+    return parsedData;
   }
 };
+
+export default readCSVFile;
