@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 
 import Form from "./Form";
+import ResultsDisplayer from "./ResultsDisplayer";
 
 import readCSVFile from "../../lib/readDataFromFile";
 
@@ -19,7 +20,6 @@ const ClientSideUI = () => {
   const getDataFromCSVFile = (csvFile) => {
     const parsedCSVFile = readCSVFile(csvFile);
     setDataFromCSVFile(parsedCSVFile);
-    console.log(parsedCSVFile);
   };
 
   const getData = async () => {
@@ -59,7 +59,10 @@ const ClientSideUI = () => {
         getLightHouseData,
       ]);
 
-      if (allDataWithStats[0].length !== allDataWithStats[1].length)
+      if (
+        allDataWithStats[0].length !== allDataWithStats[1].length ||
+        allDataWithStats[0].length === 0
+      )
         throw new Error("We failed to generate data");
 
       const returnArray = [];
@@ -82,51 +85,20 @@ const ClientSideUI = () => {
   };
 
   useEffect(() => {
-    //wait for getData to finish and then start generating the csv file with the new values
-    //getData();
-  }, []);
-
-  useEffect(() => {
     console.log("Companys:", companys);
   }, [companys]);
 
-  //base showing lighthouse test off this code snippet
-  /*fetch(url)
-    .then(response => response.json())
-    .then(json => {
-      // See https://developers.google.com/speed/docs/insights/v5/reference/pagespeedapi/runpagespeed#response
-      // to learn more about each of the properties in the response object.
-      showInitialContent(json.id);
-      const cruxMetrics = {
-        "First Contentful Paint": json.loadingExperience.metrics.FIRST_CONTENTFUL_PAINT_MS.category,
-        "First Input Delay": json.loadingExperience.metrics.FIRST_INPUT_DELAY_MS.category
-      };
-      showCruxContent(cruxMetrics);
-      const lighthouse = json.lighthouseResult;
-      const lighthouseMetrics = {
-        'First Contentful Paint': lighthouse.audits['first-contentful-paint'].displayValue,
-        'Speed Index': lighthouse.audits['speed-index'].displayValue,
-        'Time To Interactive': lighthouse.audits['interactive'].displayValue,
-        'First Meaningful Paint': lighthouse.audits['first-meaningful-paint'].displayValue,
-        'First CPU Idle': lighthouse.audits['first-cpu-idle'].displayValue,
-        'Estimated Input Latency': lighthouse.audits['estimated-input-latency'].displayValue
-      };
-      showLighthouseContent(lighthouseMetrics);
-    });*/
-
-  const ShowResults = () => {
-    return (
-      <div>{companys.i1 ? <p>Got results </p> : <p>{errorMessage}</p>}</div>
-    );
-  };
   const ContentSection = () => {
     return (
       <div>
         {gotResponse ? (
-          <ShowResults />
+          <ResultsDisplayer />
         ) : (
           <div>
-            <p>
+            <h2 className="text-3xl text-white font-semibold">
+              Getting to work
+            </h2>
+            <p className="text-xl text-slate-200 my-4">
               We&apos;re processing the data, please don&apos;t refresh the
               page.
             </p>
@@ -147,7 +119,7 @@ const ClientSideUI = () => {
         />
       </div>
       <div
-        className={`mt-8 ${!isFormSubmitted && "hidden"} ${
+        className={`${!isFormSubmitted && "hidden"} ${
           errorOccured && "hidden"
         }`}
       >
@@ -155,7 +127,7 @@ const ClientSideUI = () => {
           <ContentSection />
         </div>
         <div className={`${dataRequested && "hidden"}`}>
-          <h2 className="text-3xl font-semibold text-white -mt-6">
+          <h2 className="text-3xl font-semibold text-white ">
             We&apos;ve got Your file!
           </h2>
           <button

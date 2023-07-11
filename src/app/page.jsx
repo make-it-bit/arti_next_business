@@ -6,9 +6,9 @@ export default function Home() {
   return (
     <div className="text-center">
       <header className="min-[300px]:pt-15 md:pt-20 pt-10 sm:px-4 lg:px-8 px-2 mx-auto">
-        <h1 className="2xl:text-8xl lg:text-8xl text-3xl min-[300px]:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-custom_purple to-black">
+        <h1 className="2xl:text-8xl lg:text-8xl text-3xl min-[300px]:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-custom_purple to-custom_black">
           Audits of{" "}
-          <span className="min-[1220px]:inline-block bg-black text-white px-1 rounded-md min-[1220px]:whitespace-nowrap">
+          <span className="min-[1220px]:inline-block bg-custom_black text-white px-1 rounded-md min-[1220px]:whitespace-nowrap">
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-white to-pink-500">
               Your business&apos;s online
             </span>
